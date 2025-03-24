@@ -46,7 +46,7 @@ export default function Home() {
 
   useEffect(() => {
     console.log('[FRONTEND] Attempting to connect to WebSocket server...');
-    const newSocket = io('http://localhost:3001');
+    const newSocket = io(process.env.NEXT_PUBLIC_SOCKET_URL);
     setSocket(newSocket);
 
     newSocket.on('connect', () => {
