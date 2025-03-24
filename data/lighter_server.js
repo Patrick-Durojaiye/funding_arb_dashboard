@@ -36,10 +36,10 @@ ws.on('open', () => {
 ws.on('message', (data) => {
     try {
         const parsedData = JSON.parse(data);
-        console.log("[LIGHTER] Received raw data:", data.toString());
+        //console.log("[LIGHTER] Received raw data:", data.toString());
         
         if (parsedData.type === "update/market_stats") {
-            console.log("[LIGHTER] Received market stats update");
+            //console.log("[LIGHTER] Received market stats update");
 
             Object.keys(parsedData.market_stats).forEach(marketId => {
                 const marketData = parsedData.market_stats[marketId];
@@ -54,8 +54,8 @@ ws.on('message', (data) => {
                     timestamp: new Date().toISOString()
                 });
 
-                console.log(`[LIGHTER] Processed market data - Symbol: ${marketSymbol}, Current Funding Rate: ${current_funding_rate}`);
-                console.log("[LIGHTER] Current stored data:", [...lighterData.entries()]);
+                //console.log(`[LIGHTER] Processed market data - Symbol: ${marketSymbol}, Current Funding Rate: ${current_funding_rate}`);
+                //console.log("[LIGHTER] Current stored data:", [...lighterData.entries()]);
                 
                 // Only check for arbitrage opportunities once per minute
                 const now = Date.now();

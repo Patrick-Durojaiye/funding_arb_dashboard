@@ -31,29 +31,28 @@ const checkArbitrageOpportunities = () => {
         return;
     }
     
-    console.log("[AGGREGATOR] Current Hyperliquid data:", [...hyperliquidData.entries()]);
-    console.log("[AGGREGATOR] Current Lighter data:", [...lighterData.entries()]);
+    // console.log("[AGGREGATOR] Current Hyperliquid data:", [...hyperliquidData.entries()]);
+    // console.log("[AGGREGATOR] Current Lighter data:", [...lighterData.entries()]);
 
     for (const [symbol, hyperliquidInfo] of hyperliquidData) {
         const lighterInfo = lighterData.get(symbol);
         if (lighterInfo) {
-            console.log(`[AGGREGATOR] Found matching data for symbol ${symbol}`);
-            console.log(`[AGGREGATOR] Hyperliquid funding rate: ${hyperliquidInfo.funding}`);
-            console.log(`[AGGREGATOR] Lighter funding rate: ${lighterInfo.funding_rate}`);
+            // console.log(`[AGGREGATOR] Found matching data for symbol ${symbol}`);
+            // console.log(`[AGGREGATOR] Hyperliquid funding rate: ${hyperliquidInfo.funding}`);
+            // console.log(`[AGGREGATOR] Lighter funding rate: ${lighterInfo.funding_rate}`);
 
             const arbitrageResult = calculateArbitrage(
                 300000, // Default position size
-                hyperliquidInfo.funding,
+                hyperliquidInfo.funding*100,
                 lighterInfo.funding_rate,
                 0.01, // Maker fee
                 0.035 // Taker fee
             );
 
             if (arbitrageResult) {
-                console.log(`[AGGREGATOR] Found arbitrage opportunity for ${symbol}:`, arbitrageResult);
                 
                 if (global.io) {
-                    console.log("[AGGREGATOR] Emitting arbitrage opportunity to frontend");
+                    // console.log("[AGGREGATOR] Emitting arbitrage opportunity to frontend");
                     global.io.emit('arbitrageOpportunity', {
                         symbol,
                         timestamp: new Date().toISOString(),

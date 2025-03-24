@@ -40,7 +40,7 @@ ws.on('open', () => {
 ws.on('message', (data) => {
     try {
         const parsedData = JSON.parse(data);
-        console.log("[HYPERLIQUID] Received raw data:", data.toString());
+        //console.log("[HYPERLIQUID] Received raw data:", data.toString());
 
         if (parsedData.channel === "subscriptionResponse" && parsedData.data?.subscription?.type === "activeAssetCtx") {
             console.log("[HYPERLIQUID] Subscription confirmed:", parsedData);
@@ -57,8 +57,8 @@ ws.on('message', (data) => {
                 timestamp: new Date().toISOString()
             });
 
-            console.log(`[HYPERLIQUID] Processed data - Asset: ${coin}, Funding: ${funding}`);
-            console.log("[HYPERLIQUID] Current stored data:", [...hyperliquidData.entries()]);
+            //console.log(`[HYPERLIQUID] Processed data - Asset: ${coin}, Funding: ${funding}`);
+            // console.log("[HYPERLIQUID] Current stored data:", [...hyperliquidData.entries()]);
 
             // Only check for arbitrage opportunities once per minute
             const now = Date.now();
