@@ -6,9 +6,9 @@ const CACHE_TIMESTAMP_KEY = 'arbitrage_opportunities_timestamp';
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 
 // Get WebSocket URL from environment variable or use localhost as fallback
-const WS_URL = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3000';
+const WS_URL = process.env.NEXT_PUBLIC_SOCKET_URL;
 console.log('[FRONTEND] WebSocket URL:', WS_URL);
-console.log('[FRONTEND] Environment:', process.env.NODE_ENV || 'development');
+console.log('[FRONTEND] Environment:', process.env.NODE_ENV);
 
 export default function Home() {
   const [opportunities, setOpportunities] = useState([]);

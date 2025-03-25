@@ -11,9 +11,9 @@ const app = express();
 const server = http.createServer(app);
 
 // Configure CORS
-const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+const frontendUrl = process.env.FRONTEND_URL;
 console.log('[SERVER] Frontend URL:', frontendUrl);
-console.log('[SERVER] Environment:', process.env.NODE_ENV || 'development');
+console.log('[SERVER] Environment:', process.env.NODE_ENV);
 
 // Configure Socket.IO with CORS
 const io = new Server(server, {
@@ -69,7 +69,7 @@ io.engine.on('connection_error', (err) => {
 });
 
 const PORT = process.env.PORT;
-server.listen(PORT, '::', () => {
+server.listen(PORT, () => {
     console.log(`[SERVER] Server running on port ${PORT}`);
     console.log('[SERVER] Waiting for frontend connection...');
 }); 
