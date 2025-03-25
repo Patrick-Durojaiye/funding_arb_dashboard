@@ -5,6 +5,11 @@ const CACHE_KEY = 'arbitrage_opportunities';
 const CACHE_TIMESTAMP_KEY = 'arbitrage_opportunities_timestamp';
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 
+// Get WebSocket URL from environment variable or use localhost as fallback
+const WS_URL = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3000';
+console.log('[FRONTEND] WebSocket URL:', WS_URL);
+console.log('[FRONTEND] Environment:', process.env.NODE_ENV || 'development');
+
 export default function Home() {
   const [opportunities, setOpportunities] = useState([]);
   const [socket, setSocket] = useState(null);
@@ -45,12 +50,41 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    console.log('[FRONTEND] Attempting to connect to WebSocket server...');
-    const newSocket = io(process.env.NEXT_PUBLIC_SOCKET_URL);
+    console.log('[FRONTEND] Attempting to connect to WebSocket server at:', WS_URL);
+    
+    // Use the socket io manager directly to debug 
+    const manager = io.Manager(WS_URL, {
+      reconnection: true,
+      reconnectionAttempts: Infinity,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      timeout: 20000,
+    });
+    
+    manager.on('reconnect_attempt', (attempt) => {
+      console.log(`[FRONTEND] Reconnection attempt ${attempt}`);
+      setConnectionStatus(`Reconnecting (attempt ${attempt})...`);
+    });
+    
+    manager.on('reconnect_error', (err) => {
+      console.error('[FRONTEND] Reconnect error:', err);
+      setError(`Reconnection error: ${err.message}`);
+    });
+    
+    manager.on('reconnect_failed', () => {
+      console.error('[FRONTEND] Failed to reconnect');
+      setConnectionStatus('Reconnection failed');
+    });
+    
+    const newSocket = manager.socket('/', {
+      transports: ['websocket', 'polling'],
+      withCredentials: true
+    });
+    
     setSocket(newSocket);
 
     newSocket.on('connect', () => {
-      console.log('[FRONTEND] Connected to WebSocket server');
+      console.log('[FRONTEND] Connected to WebSocket server, ID:', newSocket.id);
       setConnectionStatus('Connected');
       setError(null);
     });
@@ -58,7 +92,17 @@ export default function Home() {
     newSocket.on('connect_error', (err) => {
       console.error('[FRONTEND] Connection error:', err);
       setConnectionStatus('Connection Error');
-      setError(err.message);
+      setError(`Connection error: ${err.message}`);
+    });
+
+    newSocket.on('disconnect', (reason) => {
+      console.log('[FRONTEND] Disconnected from server, reason:', reason);
+      setConnectionStatus(`Disconnected: ${reason}`);
+    });
+
+    newSocket.on('error', (err) => {
+      console.error('[FRONTEND] Socket error:', err);
+      setError(`Socket error: ${err.message}`);
     });
 
     newSocket.on('test', (data) => {
