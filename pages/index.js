@@ -18,21 +18,19 @@ export default function Home() {
   const [lastUpdate, setLastUpdate] = useState(null);
   const [sortConfig, setSortConfig] = useState({
     key: null,
-    direction: 'desc'
+    direction: 'desc',
   });
 
-  // Load cached data on initial render
   useEffect(() => {
     const loadCachedData = () => {
       try {
         const cachedData = localStorage.getItem(CACHE_KEY);
         const cachedTimestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY);
-        
+
         if (cachedData && cachedTimestamp) {
           const timestamp = parseInt(cachedTimestamp);
           const now = Date.now();
-          
-          // Only use cache if it's less than 5 minutes old
+
           if (now - timestamp < CACHE_DURATION) {
             setOpportunities(JSON.parse(cachedData));
             setLastUpdate(new Date(timestamp));
@@ -51,9 +49,8 @@ export default function Home() {
 
   useEffect(() => {
     console.log('[FRONTEND] Attempting to connect to WebSocket server at:', WS_URL);
-    
-    // Use the socket io manager directly to debug 
-    const manager = io(WS_URL, {
+
+    const newSocket = io(WS_URL, {
       transports: ['websocket', 'polling'],
       withCredentials: true,
       reconnection: true,
@@ -63,32 +60,27 @@ export default function Home() {
       timeout: 20000,
     });
 
-    manager.on('reconnect_attempt', (attempt) => {
-      console.log(`[FRONTEND] Reconnection attempt ${attempt}`);
-      setConnectionStatus(`Reconnecting (attempt ${attempt})...`);
-    });
-    
-    manager.on('reconnect_error', (err) => {
-      console.error('[FRONTEND] Reconnect error:', err);
-      setError(`Reconnection error: ${err.message}`);
-    });
-    
-    manager.on('reconnect_failed', () => {
-      console.error('[FRONTEND] Failed to reconnect');
-      setConnectionStatus('Reconnection failed');
-    });
-    
-    const newSocket = manager.socket('/', {
-      transports: ['websocket', 'polling'],
-      withCredentials: true
-    });
-    
     setSocket(newSocket);
 
     newSocket.on('connect', () => {
       console.log('[FRONTEND] Connected to WebSocket server, ID:', newSocket.id);
       setConnectionStatus('Connected');
       setError(null);
+    });
+
+    newSocket.on('reconnect_attempt', (attempt) => {
+      console.log(`[FRONTEND] Reconnection attempt ${attempt}`);
+      setConnectionStatus(`Reconnecting (attempt ${attempt})...`);
+    });
+
+    newSocket.on('reconnect_error', (err) => {
+      console.error('[FRONTEND] Reconnect error:', err);
+      setError(`Reconnection error: ${err.message}`);
+    });
+
+    newSocket.on('reconnect_failed', () => {
+      console.error('[FRONTEND] Failed to reconnect');
+      setConnectionStatus('Reconnection failed');
     });
 
     newSocket.on('connect_error', (err) => {
@@ -113,21 +105,20 @@ export default function Home() {
 
     newSocket.on('arbitrageOpportunity', (data) => {
       console.log('[FRONTEND] Received arbitrage opportunity:', data);
-      setOpportunities(prev => {
+      setOpportunities((prev) => {
         const newOpportunities = [...prev];
-        const existingIndex = newOpportunities.findIndex(opp => opp.symbol === data.symbol);
-        
+        const existingIndex = newOpportunities.findIndex((opp) => opp.symbol === data.symbol);
+
         if (existingIndex >= 0) {
           newOpportunities[existingIndex] = data;
         } else {
           newOpportunities.push(data);
         }
-        
-        // Cache the updated data
+
         localStorage.setItem(CACHE_KEY, JSON.stringify(newOpportunities));
         localStorage.setItem(CACHE_TIMESTAMP_KEY, Date.now().toString());
         setLastUpdate(new Date());
-        
+
         return newOpportunities;
       });
     });
