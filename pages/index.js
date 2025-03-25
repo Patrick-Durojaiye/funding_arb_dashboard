@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import io from 'socket.io-client';
+import {io} from 'socket.io-client';
 
 const CACHE_KEY = 'arbitrage_opportunities';
 const CACHE_TIMESTAMP_KEY = 'arbitrage_opportunities_timestamp';
@@ -53,14 +53,16 @@ export default function Home() {
     console.log('[FRONTEND] Attempting to connect to WebSocket server at:', WS_URL);
     
     // Use the socket io manager directly to debug 
-    const manager = io.Manager(WS_URL, {
+    const manager = io(WS_URL, {
+      transports: ['websocket', 'polling'],
+      withCredentials: true,
       reconnection: true,
       reconnectionAttempts: Infinity,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
       timeout: 20000,
     });
-    
+
     manager.on('reconnect_attempt', (attempt) => {
       console.log(`[FRONTEND] Reconnection attempt ${attempt}`);
       setConnectionStatus(`Reconnecting (attempt ${attempt})...`);
