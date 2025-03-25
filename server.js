@@ -68,7 +68,7 @@ io.engine.on('connection_error', (err) => {
     console.error('[SERVER] Connection error:', err);
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 server.listen(PORT, '::', () => {
     console.log(`[SERVER] Server running on port ${PORT}`);
     console.log('[SERVER] Waiting for frontend connection...');
