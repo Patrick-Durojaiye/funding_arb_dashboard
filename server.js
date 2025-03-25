@@ -2,7 +2,10 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
-
+const next = require('next'); // ← Load Next.js
+const dev = process.env.NODE_ENV !== 'production'; // ← Set dev/prod mode
+const nextApp = next({ dev }); // ← Initialize Next.js app
+const handle = nextApp.getRequestHandler(); // ← Get Next.js handler
 // Import WebSocket servers
 require('./data/hyperliquid_server');
 require('./data/lighter_server');
