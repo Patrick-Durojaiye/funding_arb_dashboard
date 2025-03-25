@@ -51,6 +51,7 @@ export default function Home() {
     console.log('[FRONTEND] Attempting to connect to WebSocket server at:', WS_URL);
 
     const newSocket = io(WS_URL, {
+      path: 'socket.io',
       transports: ['websocket', 'polling'],
       withCredentials: true,
       reconnection: true,

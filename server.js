@@ -32,12 +32,13 @@ nextApp.prepare().then(() => {
 
     // WebSocket server
     const io = new Server(server, {
+        path: 'socket.io',
         cors: {
             origin: [frontendUrl],
             methods: ["GET", "POST"],
             credentials: true
         },
-        transports: ['polling','websocket'],
+        transports: ['websocket','polling'],
         pingTimeout: 60000,
         pingInterval: 25000
     });
