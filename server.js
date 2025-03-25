@@ -43,6 +43,9 @@ app.get('/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// Serve Next.js frontend
+app.all('*', (req, res) => handle(req, res));
+
 // Make io available globally for our data aggregator
 global.io = io;
 
